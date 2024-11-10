@@ -1,39 +1,23 @@
-import process from 'node:process';
-import yoctocolors from 'yoctocolors';
+import process from "node:process";
+import yoctocolors from "yoctocolors";
 
-const isUnicodeSupported = process.platform !== 'win32' || Boolean(process.env.WT_SESSION);
+const isUnicodeSupported =
+	process.platform !== "win32" || Boolean(process.env.WT_SESSION);
 
-const isInteractive = stream => Boolean(
-	stream.isTTY
-	&& process.env.TERM !== 'dumb'
-	&& !('CI' in process.env),
-);
+const isInteractive = (stream) =>
+	Boolean(
+		stream.isTTY && process.env.TERM !== "dumb" && !("CI" in process.env)
+	);
 
-const infoSymbol = yoctocolors.blue(isUnicodeSupported ? 'ℹ' : 'i');
-const successSymbol = yoctocolors.green(isUnicodeSupported ? '✔' : '√');
-const warningSymbol = yoctocolors.yellow(isUnicodeSupported ? '⚠' : '‼');
-const errorSymbol = yoctocolors.red(isUnicodeSupported ? '✖️' : '×');
+const infoSymbol = yoctocolors.blue(isUnicodeSupported ? "ℹ" : "i");
+const successSymbol = yoctocolors.green(isUnicodeSupported ? "✔" : "√");
+const warningSymbol = yoctocolors.yellow(isUnicodeSupported ? "⚠" : "‼");
+const errorSymbol = yoctocolors.red(isUnicodeSupported ? "✖️" : "×");
 
 const defaultSpinner = {
 	frames: isUnicodeSupported
-		? [
-			'⠋',
-			'⠙',
-			'⠹',
-			'⠸',
-			'⠼',
-			'⠴',
-			'⠦',
-			'⠧',
-			'⠇',
-			'⠏',
-		]
-		: [
-			'-',
-			'\\',
-			'|',
-			'/',
-		],
+		? ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+		: ["-", "\\", "|", "/"],
 	interval: 80,
 };
 
@@ -54,10 +38,10 @@ class YoctoSpinner {
 		const spinner = options.spinner ?? defaultSpinner;
 		this.#frames = spinner.frames;
 		this.#interval = spinner.interval;
-		this.#text = options.text ?? '';
+		this.#text = options.text ?? "";
 		this.#stream = options.stream ?? process.stderr;
-		this.#color = options.color ?? 'cyan';
-		this.#isInteractive = isInteractive(this.#stream);
+		this.#color = options.color ?? "cyan";
+		this.#isInteractive = false;
 		this.#exitHandlerBound = this.#exitHandler.bind(this);
 	}
 
@@ -127,7 +111,7 @@ class YoctoSpinner {
 		return this.#text;
 	}
 
-	set text(value = '') {
+	set text(value = "") {
 		this.#text = value;
 		this.#render();
 	}
@@ -164,7 +148,10 @@ class YoctoSpinner {
 
 		// Ensure we only update the spinner frame at the wanted interval,
 		// even if the render method is called more often.
-		if (this.#currentFrame === -1 || currentTime - this.#lastSpinnerFrameTime >= this.#interval) {
+		if (
+			this.#currentFrame === -1 ||
+			currentTime - this.#lastSpinnerFrameTime >= this.#interval
+		) {
 			this.#currentFrame = (this.#currentFrame + 1) % this.#frames.length;
 			this.#lastSpinnerFrameTime = currentTime;
 		}
@@ -174,7 +161,7 @@ class YoctoSpinner {
 		let string = `${applyColor(frame)} ${this.#text}`;
 
 		if (!this.#isInteractive) {
-			string += '\n';
+			string += "\n";
 		}
 
 		this.clear();
@@ -191,7 +178,7 @@ class YoctoSpinner {
 
 	#lineCount(text) {
 		const width = this.#stream.columns ?? 80;
-		const lines = text.split('\n');
+		const lines = text.split("\n");
 
 		let lineCount = 0;
 		for (const line of lines) {
@@ -203,24 +190,24 @@ class YoctoSpinner {
 
 	#hideCursor() {
 		if (this.#isInteractive) {
-			this.#write('\u001B[?25l');
+			this.#write("\u001B[?25l");
 		}
 	}
 
 	#showCursor() {
 		if (this.#isInteractive) {
-			this.#write('\u001B[?25h');
+			this.#write("\u001B[?25h");
 		}
 	}
 
 	#subscribeToProcessEvents() {
-		process.once('SIGINT', this.#exitHandlerBound);
-		process.once('SIGTERM', this.#exitHandlerBound);
+		process.once("SIGINT", this.#exitHandlerBound);
+		process.once("SIGTERM", this.#exitHandlerBound);
 	}
 
 	#unsubscribeFromProcessEvents() {
-		process.off('SIGINT', this.#exitHandlerBound);
-		process.off('SIGTERM', this.#exitHandlerBound);
+		process.off("SIGINT", this.#exitHandlerBound);
+		process.off("SIGTERM", this.#exitHandlerBound);
 	}
 
 	#exitHandler(signal) {
@@ -230,7 +217,7 @@ class YoctoSpinner {
 
 		// SIGINT: 128 + 2
 		// SIGTERM: 128 + 15
-		const exitCode = signal === 'SIGINT' ? 130 : (signal === 'SIGTERM' ? 143 : 1);
+		const exitCode = signal === "SIGINT" ? 130 : signal === "SIGTERM" ? 143 : 1;
 		process.exit(exitCode);
 	}
 }
