@@ -1,4 +1,4 @@
-import {type Writable} from 'node:stream';
+import { type Writable } from "node:stream";
 
 export type SpinnerStyle = {
 	readonly interval?: number;
@@ -6,15 +6,15 @@ export type SpinnerStyle = {
 };
 
 export type Color =
-	| 'black'
-	| 'red'
-	| 'green'
-	| 'yellow'
-	| 'blue'
-	| 'magenta'
-	| 'cyan'
-	| 'white'
-	| 'gray';
+	| "black"
+	| "red"
+	| "green"
+	| "yellow"
+	| "blue"
+	| "magenta"
+	| "cyan"
+	| "white"
+	| "gray";
 
 export type Options = {
 	/**
@@ -51,6 +51,13 @@ export type Options = {
 	@default process.stderr
 	*/
 	readonly stream?: Writable;
+
+	/**
+	Whether to render the cursor.
+
+	@default true
+	*/
+	readonly renderCursor?: boolean;
 };
 
 export type Spinner = {

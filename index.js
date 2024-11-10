@@ -33,6 +33,7 @@ class YoctoSpinner {
 	#exitHandlerBound;
 	#isInteractive;
 	#lastSpinnerFrameTime = 0;
+	#renderCursor = true;
 
 	constructor(options = {}) {
 		const spinner = options.spinner ?? defaultSpinner;
@@ -41,8 +42,9 @@ class YoctoSpinner {
 		this.#text = options.text ?? "";
 		this.#stream = options.stream ?? process.stderr;
 		this.#color = options.color ?? "cyan";
-		this.#isInteractive = false;
+		this.#isInteractive = isInteractive(this.#stream);
 		this.#exitHandlerBound = this.#exitHandler.bind(this);
+		this.#renderCursor = options.renderCursor;
 	}
 
 	start(text) {
@@ -189,13 +191,13 @@ class YoctoSpinner {
 	}
 
 	#hideCursor() {
-		if (this.#isInteractive) {
+		if (this.#isInteractive && this.#renderCursor) {
 			this.#write("\u001B[?25l");
 		}
 	}
 
 	#showCursor() {
-		if (this.#isInteractive) {
+		if (this.#isInteractive && this.#renderCursor) {
 			this.#write("\u001B[?25h");
 		}
 	}
